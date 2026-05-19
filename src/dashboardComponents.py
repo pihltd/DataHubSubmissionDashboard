@@ -242,6 +242,64 @@ datacontent2 = html.Div([
     ])
 ])
 
+deletedatatitle = html.Div([
+    html.Hr(),
+    html.H2("Delete Data", id='deletetitle')
+])
+
+deleteheader = html.Div([
+    html.P("Let's just be clear:  This page let's you screw up your submissions but good.  You can do real damage here that can only be reveresed by re-submitting data.  So be sure to ask questions first."),
+    html.P("The purpose of this script is to accept a standard CDRC loading sheet (such as those used to upload data to the Submission Portal and DELETE the information in each row."),
+    html.B("********* If you accidentally delete information, it will have to be resubmitted, there is no undo feature *********"),
+    html.Hr(),
+    html.B("Also note that if a deletion results in orphan nodes, the orphans will also be deleted"),
+    html.Hr()
+])
+
+deletecontent = html.Div([
+    dcc.Loading([
+        html.Div(id="deletecontent")
+    ])
+])
+
+deletesetupbutton = html.Button("Setup the system for a deletion", id='deletesubinfo', n_clicks=0)
+
+deleteupdateContent = html.Div([
+    html.B("Step 2: Gather information needed for the deletion by clicking this button: "),
+    deletesetupbutton
+])
+
+
+deleteFileUpload = dcc.Upload(
+    id='fileupload',
+    children=html.Div([
+       'Step 3: Drag and drop a manifest file or ',
+       html.A('Select a manifest file') 
+    ]),
+    style={
+            'width': '100%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderWidth': '1px',
+            'borderStyle': 'dashed',
+            'borderRadius': '5px',
+            'textAlign': 'center',
+            'margin': '10px'
+        },
+    multiple=False
+)
+
+deleteRadioHeader = html.Div([
+    html.B("Step 3: Indicate which node type will be deleted"),
+    html.Div(id='nodeoptions')
+])
+
+deletetablecontent = html.Div([
+    dcc.Loading([
+        html.Div(id='deletetablecontent')
+    ])
+])
+
 
 # https://stackoverflow.com/questions/70352045/dash-keep-tabs-bar-on-top-and-remember-where-was-scrolled-between-tabs
 # The id = tabs-container points to tabs.css in the assets folder and makes the tabs sticky at the top
@@ -283,7 +341,23 @@ sitecontent =html.Div([
                 style=ds.TAB_STYLE,
                 selected_style=ds.SELECTED_TAB_STYLE,
                 children=[dataheader, datacontent2]
-                )
+                ),
+        dcc.Tab(label="Data Deletion",
+                value='tab-delete',
+                id='deletetab',
+                style=ds.TAB_STYLE,
+                selected_style=ds.SELECTED_TAB_STYLE,
+                children=[deletedatatitle,
+                          deleteheader,
+                          deletecontent,
+                          deleteupdateContent,
+                          deleteRadioHeader,
+                          html.Hr(),
+                          html.Div(deleteFileUpload),
+                          html.Hr(),
+                          html.Div(deletetablecontent)
+                ]
+            )
         ]
     )
 ],style=ds.CONTENT_STYLE)

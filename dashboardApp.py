@@ -20,6 +20,8 @@ app.layout = html.Div([
     dcc.Store(id='studystore'),
     dcc.Store(id='submissionstore'),
     dcc.Store(id='selectedsubmissionstore'),
+    dcc.Store(id="deletedatastore"),
+    dcc.Store(id='modelstore'),
     sidebar, sitecontent
 ])
 
@@ -29,6 +31,7 @@ from src.dashboardGraphicsCallbacks import *
 from src.dashboardStoreCallbacks import *
 from src.dashboardTitleCallbacks import *
 from src.dashboardTableCallbacks import *
+from src.dashboardDeleteCallbacks import *
 
 
 if __name__ == "__main__":

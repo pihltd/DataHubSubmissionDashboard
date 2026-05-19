@@ -315,3 +315,12 @@ query SubmissionSummary(
     }
   }
 """
+
+getModelQuery = """
+  query getSubmission($id: ID!){
+    getSubmission(_id:$id){
+      dataCommons
+      modelVersion
+    }
+  }
+"""

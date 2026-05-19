@@ -105,3 +105,6 @@ def batchTableTitle(subselector):
         return ("Batch History for Submission")
     else:
         return(f"Batch History for Submission: {subselector}")
+    
+
+
