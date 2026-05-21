@@ -324,3 +324,20 @@ getModelQuery = """
     }
   }
 """
+
+deleteQuery = """
+    mutation deleteDataRecords(
+        $_id: String!, 
+        $nodeType: String!, 
+        $nodeIds: [String!], 
+        $deleteAll: Boolean,
+        $exclusiveIDs: [String!]) 
+    { deleteDataRecords(
+        submissionID: $_id, 
+        nodeType: $nodeType,
+        nodeIDs: $nodeIds, 
+        deleteAll: $deleteAll, 
+        exclusiveIDs: $exclusiveIDs)
+    { success
+      message } } 
+"""

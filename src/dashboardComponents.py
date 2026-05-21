@@ -265,7 +265,7 @@ deletecontent = html.Div([
 deletesetupbutton = html.Button("Setup the system for a deletion", id='deletesubinfo', n_clicks=0)
 
 deleteupdateContent = html.Div([
-    html.B("Step 2: Gather information needed for the deletion by clicking this button: "),
+    html.B("Step 1: Set submission information needed for the deletion by clicking this button: "),
     deletesetupbutton
 ])
 
@@ -290,14 +290,18 @@ deleteFileUpload = dcc.Upload(
 )
 
 deleteRadioHeader = html.Div([
-    html.B("Step 3: Indicate which node type will be deleted"),
+    html.B("Step 2: Indicate which node type will be deleted (populated after Step 1)."),
     html.Div(id='nodeoptions')
 ])
 
 deletetablecontent = html.Div([
     dcc.Loading([
-        html.Div(id='deletetablecontent')
+        html.Div(id='deletetablecontent'),
     ])
+])
+
+theBigDeleteButton = html.Div([
+    html.Button("Delete Uploaded Information", id="nukefromorbit", n_clicks=0, style={'background-color':'red', 'color':'white', 'font-weight':'bold'})
 ])
 
 
@@ -355,7 +359,9 @@ sitecontent =html.Div([
                           html.Hr(),
                           html.Div(deleteFileUpload),
                           html.Hr(),
-                          html.Div(deletetablecontent)
+                          html.Div(deletetablecontent),
+                          html.Hr(),
+                          theBigDeleteButton
                 ]
             )
         ]

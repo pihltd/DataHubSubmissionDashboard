@@ -208,24 +208,38 @@ def buildUpdateDataframe(subid, tier):
         return None
 
 
-
-
-def stsModelNodes(handle, version):
-    url = f"https://sts.cancer.gov/v2/model/{handle}/version/{version}/nodes?skip=0&limit=0"
-    print(url)
+def stsRunQuery(url):
     headers = {'accept': 'application/json'}
 
     try:
         stsres = requests.get(url=url, headers=headers)
         if stsres.status_code == 200:
-            print(stsres.json())
-            nodelist = []
-            for result in stsres.json():
-                nodelist.append(result['handle'])
-            return nodelist
+            return stsres.json()
         else:
-            print(stsres)
-            return []
+            return None
 
     except requests.exceptions.HTTPError as e:
         return(f"HTTP Error: {e}")
+
+
+def stsModelNodes(handle, version):
+    url = f"https://sts.cancer.gov/v2/model/{handle}/version/{version}/nodes?skip=0&limit=0"
+    stsres = stsRunQuery(url)
+    if stsres is not None:
+        nodelist = []
+        for result in stsres:
+            nodelist.append(result['handle'])
+        return nodelist
+    else:
+        return []
+
+
+def stsKeyProperty(modelhandle, modelversion, nodename):
+    url=f"https://sts.cancer.gov/v2/model/{modelhandle}/version/{modelversion}/node/{nodename}/properties?skip=0&limit=0"
+    stsres = stsRunQuery(url)
+    keyprop = None
+    if stsres is not None:
+        for entry in stsres:
+            if entry['is_key']:
+                keyprop = entry['handle']
+    return keyprop

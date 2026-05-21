@@ -91,9 +91,6 @@ def subStatusChart(subselector, submissionstore, tierselector):
 def subStatusPercentageChart(subselector, submissionstore, tierselector):
     sub_df = pd.read_json(io.StringIO(submissionstore),orient='split')
     idlist = sub_df.query("name == @subselector")["_id"].tolist()
-    #colors = {'new':'blue', 'error': 'red', 'warning':'yellow', 'passed':'green'}
-    #colors = {'new':'#74D4FF' , 'error': '#FFA2A2', 'warning': '#FFF085', 'passed': '#7BF1A8'}
-    #colors = {'new':'#3498DB' , 'error': '#E74C3C', 'warning': '#F4D03F', 'passed': '#16A085'}
     colors = {'new': sub_blue , 'error': sub_red, 'warning': sub_yellow, 'passed': sub_green}
     if len(idlist) >=1:
         qvars = {'id':idlist[0]}
