@@ -31,11 +31,13 @@ sidebar = html.Div(
                     'Select a Study'
                 ),
                 html.Hr(),
-                dcc.Dropdown(
-                    id='studyselector',
-                    options=[],
-                    multi=False,
-                    style={'backgroundcolor':'1E1E1E'},
+                dcc.Loading( children=
+                    dcc.Dropdown(
+                        id='studyselector',
+                        options=[],
+                        multi=False,
+                        style={'backgroundcolor':'1E1E1E'},
+                    )
                 ),
                 # Submission Dropdown
                 html.Hr(),
@@ -165,28 +167,33 @@ errorpie2 = html.Div([
 
 
 errorsummary2 = html.Div([
-    dcc.Loading([
         html.Div(
             className='ErrorSummaryTable',
             children=[
                 html.Hr(),
                 html.H2("Validation Error Summary"),
-                html.Div(id="validationerrorsummary")
+                dcc.Loading(
+                    id='vesLoading',
+                    children=html.Div(id='validationerrorsummary'),
+                    type='circle'
+                )
             ],
-            style={'width':'49%', 'display':'inline-block'},
+            style={'padding':10, 'flex':1},
         ),
         html.Div(
             className='WarningSummaryTable',
             children=[
                 html.Hr(),
                 html.H2("Validation Warning Summary"),
-                html.Div(id='validationswarningsummary')
+                dcc.Loading(
+                    id='vwsLoading',
+                    children=html.Div(id='validationswarningsummary'),
+                    type='circle'
+                )
             ],
-            style={'width': '49%','display':'inline-block'},
+            style={'padding':10, 'flex':1},
         ),
-    ])
-])
-
+], style={'display':'flex', 'flexDirection': 'row'})
 
 dataheader = html.Div(
     [

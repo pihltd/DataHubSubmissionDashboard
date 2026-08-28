@@ -110,7 +110,11 @@ def updateSubmissionClock(subid, tier):
     return updatejson
 
 
-def buildBasicTable(df, diffstyle = None):
+def buildBasicTable(df, diffstyle = None, dedup = True):
+    if dedup:
+        #Get rid of empty columns and rows
+        df.dropna(how='all', axis=1, inplace=True)
+        df.dropna(how='all', axis=0, inplace=True)
     if diffstyle is None:
         styles = [{'if':{'row_index':'odd'}, 'backgroundColor': 'rgb(220,220,220)'}]
     else:

@@ -78,6 +78,24 @@ org_query = """
   }
 """
 
+org_query2 = """
+{
+  listSubmissions(status:["New", "In Progress", "Submitted", "Rejected"]){
+    submissions{
+      study{
+        _id
+        studyName
+        studyAbbreviation
+        dbGaPID
+      }
+    }
+    
+  }
+}
+
+"""
+
+
 qc_check_query = """
 query GetQCResults(
   $id: ID!

@@ -12,11 +12,14 @@ import io
     Input(component_id='tierselector', component_property='value'),
 )
 def populateStudyStore(tierselector):
-    studyjson = ds.apiQuery(tierselector, dhq.org_query, None)
-    columns = ["_id","studyAbbreviation"]
-    study_df = pd.DataFrame(columns=columns)
-    for entry in studyjson['data']['getMyUser']['studies']:
-        study_df.loc[len(study_df)] = entry
+    studyjson = ds.apiQuery(tierselector, dhq.org_query2, None)
+    studylist = []
+    tracker = []
+    for entry in studyjson['data']['listSubmissions']['submissions']:
+        if entry['study']['_id'] not in tracker:
+            studylist.append({"_id": entry['study']['_id'], 'studyAbbreviation': entry['study']['studyAbbreviation']})
+            tracker.append(entry['study']['_id'])
+    study_df = pd.DataFrame(studylist)
     return study_df.reset_index().to_json(orient='split')
 
 
