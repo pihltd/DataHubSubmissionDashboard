@@ -1,6 +1,10 @@
 from PyQt6.QtWidgets import QDialog, QDialogButtonBox, QLabel, QVBoxLayout
 from PyQt6.QtCore import QAbstractTableModel, Qt
 
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+
 
 class CustomDialog(QDialog):
     def __init__(self, titletext, labeltext):
@@ -45,3 +49,10 @@ class SubmissionTableModel(QAbstractTableModel):
 
             if orientation == Qt.Orientation.Vertical:
                 return str(self._data.index[section])
+            
+
+class PieCanvas(FigureCanvasQTAgg):
+    def __init__(self, pieslices, pielabels, parent=None):
+        fig, ax = plt.subplot()
+        ax.pie(pieslices, labels=pielabels, labeldistance=1.15)
+        super().__init__(fig)
