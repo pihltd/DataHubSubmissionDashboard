@@ -30,10 +30,17 @@ class SubmissionTableModel(QAbstractTableModel):
         super().__init__()
         self._data = data
         
+        self.grey = '#e0e0eb'
+        
     def data(self, index, role):
+        cell_value = self._data.iloc[index.row(), index.column()]
+        
         if role == Qt.ItemDataRole.DisplayRole:
-            value = self._data.iloc[index.row(), index.column()]
-            return str(value)
+            #value = self._data.iloc[index.row(), index.column()]
+            return str(cell_value)
+        # TDP Add
+        if role == Qt.ItemDataRole.ToolTipRole:
+            return cell_value
         
     def rowCount(self, index):
         return self._data.shape[0]

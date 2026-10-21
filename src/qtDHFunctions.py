@@ -16,31 +16,35 @@ def dhAPICreds(tier):
     :return token: The API access token for the tier.
     :rtype: dictionary
     """
+    
+    #url = None
+    #token = None
+    
+    urls = {
+        'prod': 'https://hub.datacommons.cancer.gov/api/graphql',
+        'stage': 'https://hub-stage.datacommons.cancer.gov/api/graphql',
+        'qa': 'https://hub-qa.datacommons.cancer.gov/api/graphql',
+        'qa2': 'https://hub-qa2.datacommons.cancer.gov/api/graphql',
+        'dev': 'https://hub-dev.datacommons.cancer.gov/api/graphql',
+        'dev2': 'https://hub-dev2.datacommons.cancer.gov/api/graphql',
+        'localtest': 'https://this.is.a.test/url/graphql'
+    }
+    
+    apikeys = {
+        'prod': 'PRODAPI',
+        'stage': 'STAGEAPI',
+        'qa': 'QAAPI',
+        'qa2': 'QA2API',
+        'dev': 'DEVAPI',
+        'dev2': 'DEV2API',
+        'localtest': 'LOCALTESTAPI'
+    }
+    
+    if tier in urls.keys():
+        return {'url': urls[tier], 'token': os.getenv(apikeys[tier])}
+    else:
+        return {'url': None, 'token': None}
 
-    url = None
-    token = None
-    if tier == 'prod':
-        url = 'https://hub.datacommons.cancer.gov/api/graphql'
-        token = os.getenv('PRODAPI')
-    elif tier == 'stage':
-        url = 'https://hub-stage.datacommons.cancer.gov/api/graphql'
-        token = os.getenv('STAGEAPI')
-    elif tier == 'qa':
-        url = 'https://hub-qa.datacommons.cancer.gov/api/graphql'
-        token = os.getenv('QAAPI')
-    elif tier == 'qa2':
-        url = 'https://hub-qa2.datacommons.cancer.gov/api/graphql'
-        token = os.getenv('QA2API')
-    elif tier == 'dev':
-        url = 'https://hub-dev.datacommons.cancer.gov/api/graphql'
-        token = os.getenv('DEVAPI')
-    elif tier == 'dev2':
-        url = 'https://hub-dev2.datacommons.cancer.gov/api/graphql'
-        token = os.getenv('DEV2API')
-    elif tier == 'localtest':
-        url = 'https://this.is.a.test/url/graphql'
-        token = os.getenv('LOCALTESTAPI')
-    return {'url': url, 'token': token}
 
 
 def dhApiQuery(url, apitoken, query, variables=None):

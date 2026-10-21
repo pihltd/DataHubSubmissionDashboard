@@ -202,3 +202,33 @@ class SubmissionData(QObject):
             for entry in data_res['data']['getSubmissionNodes']['nodes']:
                 data_df.loc[len(data_df)] = json.loads(entry['props'])
             return data_df
+        
+    def fullReset(self):
+        self.study_df = pd.DataFrame()
+        self.submission_df = pd.DataFrame()
+        self.errordetail_df = pd.DataFrame()
+        self.errorlist = []
+        self.warningdetail_df = pd.DataFrame()
+        self.warninglist = []
+        self.datadetail_df = pd.DataFrame()
+        self.datalist = []
+        
+    def studyReset(self):
+        #self.study_df = pd.DataFrame()
+        self.submission_df = pd.DataFrame()
+        self.errordetail_df = pd.DataFrame()
+        self.errorlist = []
+        self.warningdetail_df = pd.DataFrame()
+        self.warninglist = []
+        self.datadetail_df = pd.DataFrame()
+        self.datalist = []
+    
+    def submissionReset(self):
+        #self.study_df = pd.DataFrame()
+        #self.submission_df = pd.DataFrame()
+        self.errordetail_df = pd.DataFrame()
+        self.errorlist = []
+        self.warningdetail_df = pd.DataFrame()
+        self.warninglist = []
+        self.datadetail_df = pd.DataFrame()
+        self.datalist = []

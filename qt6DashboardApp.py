@@ -1,7 +1,8 @@
-from PyQt6.QtWidgets import QApplication,  QMainWindow, QTabWidget, QVBoxLayout, QComboBox, QHBoxLayout, QWidget, QTableView, QLabel
+from PyQt6.QtWidgets import QApplication,  QMainWindow, QTabWidget, QVBoxLayout, QComboBox, QHBoxLayout, QWidget, QTableView, QLabel, QHeaderView
 from PyQt6.QtCore import QSize
+from PyQt6.QtGui import QColor
 #from PyQt6.QtCharts import QChart, QChartView, QPieSeries
-#from PySide6.QtCharts import QChart, QChartView, QPieSeries
+#from PySide6.QtCharts import QChart, QChartVie
 
 
 import pyqtgraph as pg
@@ -18,9 +19,11 @@ from layout_color_widget import Color
 class MainWindow(QMainWindow):
     
     #TODO: Need reset methods when different drop-downs are changed so that things get cleared.
-    #TODO: Table spacing
+    # When Submission changes, re-do summary table
+    # When Project changes, clera and reload Submission table and any submission related data
+    # When tier changes, reset everything
     #TODO Spinners
-    #TODO Tooltips for table entries
+
     
     def __init__(self):
         super().__init__()
@@ -34,6 +37,7 @@ class MainWindow(QMainWindow):
         self.sub_red =  '#E74C3C'
         self.sub_yellow = '#F4D03F'
         self.sub_green =  '#16A085'
+        self.tab_color = '#05ABED'
         
         
         self.setWindowTitle("CRDC Dashboard")
@@ -66,6 +70,7 @@ class MainWindow(QMainWindow):
         self.submissioncombowidget = QComboBox()
         self.submissioncombowidget.setPlaceholderText("Select a Submission to see details")
         self.submissioncombowidget.setCurrentIndex(-1)
+        self.submissioncombowidget.currentTextChanged.connect(self.submission_reset)
         self.submissioncombowidget.currentTextChanged.connect(self.submission_raw_changed)
         self.submissioncombowidget.currentTextChanged.connect(self.submission_percentage_changed)
         #self.submissioncombowidget.currentTextChanged.connect(self.errorpie)
@@ -80,7 +85,8 @@ class MainWindow(QMainWindow):
         #
         self.submissiontablelabel = QLabel("Submissions")
         self.submissiontable = QTableView()
-        
+        self.submissiontable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.submissiontable.setAlternatingRowColors(True)
         #
         # Node Count bar charts
         #
@@ -97,8 +103,12 @@ class MainWindow(QMainWindow):
         #
         self.errorsummarylabel = QLabel("Error Summary")
         self.errorsummarytable = QTableView()
+        self.errorsummarytable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.errorsummarytable.setAlternatingRowColors(True)
         self.warningsummarylabel = QLabel("Warning Summary")
         self.warningsummarytable = QTableView()
+        self.warningsummarytable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.warningsummarytable.setAlternatingRowColors(True)
         errorlayout.addWidget(self.errorsummarylabel)
         errorlayout.addWidget(self.errorsummarytable)
         errorwidget = QWidget()
@@ -120,6 +130,8 @@ class MainWindow(QMainWindow):
         
         self.fullerrorlabel = QLabel("Error Details")
         self.fullerrortable = QTableView()
+        self.fullerrortable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.fullerrortable.setAlternatingRowColors(True)
         self.errordropdown = QComboBox()
         self.errordropdown.setPlaceholderText("Select an error for full details")
         self.errordropdown.setCurrentIndex(-1)
@@ -138,6 +150,8 @@ class MainWindow(QMainWindow):
         
         self.fullwarninglabel = QLabel("Warning Details")
         self.fullwarningtable = QTableView()
+        self.fullwarningtable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.fullwarningtable.setAlternatingRowColors(True)
         self.warningdropdown = QComboBox()
         self.warningdropdown.setPlaceholderText("Select a warning for full details")
         self.warningdropdown.setCurrentIndex(-1)
@@ -155,6 +169,9 @@ class MainWindow(QMainWindow):
         
         self.fulldatalabel = QLabel("Submitted Data Details")
         self.fulldatatable = QTableView()
+        #self.fulldatatable = QTableWidget()
+        self.fulldatatable.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.fulldatatable.setAlternatingRowColors(True)
         self.datadropdown = QComboBox()
         self.datadropdown.setPlaceholderText("Select a node to see data")
         self.datadropdown.setCurrentIndex(-1)
@@ -201,6 +218,9 @@ class MainWindow(QMainWindow):
         
         tabs = QTabWidget()
         tabs.setTabPosition(QTabWidget.TabPosition.West)
+        tabpalette = tabs.palette()
+        tabpalette.setColor(tabs.backgroundRole(), QColor.fromString(self.tab_color) )
+        #tabs.setPalette(tabpalette)
 
         #tabs.addTab(dropdownwidget, "Summary")
         tabs.addTab(summarywidget, "Summary")
@@ -215,6 +235,9 @@ class MainWindow(QMainWindow):
         
         
     def tier_changed(self, t):
+        #Reset everything
+        self.theDataThing.fullReset()
+        # Now go get stuff
         self.creds = dhAPICreds(t.lower())
         if self.creds['token'] is None and self.creds['url'] is not None:
             bummer = CustomDialog("Login Error", f"No API key for {t}")
@@ -234,6 +257,12 @@ class MainWindow(QMainWindow):
 
        
     def study_changed(self, abbrev):
+        # Study level reset
+        self.theDataThing.studyReset()
+        self.submissioncombowidget.clear()
+        self.model = SubmissionTableModel(pd.DataFrame())
+        self.submissiontable.setModel(self.model)
+        # Get new data
         vars = {"status": "All"}
         self.theDataThing.getSubmissionInfo(url=self.creds['url'], apitoken=self.creds['token'], variables=vars, abbrev=abbrev)
         df = self.theDataThing.getSubmissionDataFrame()
@@ -247,8 +276,12 @@ class MainWindow(QMainWindow):
         self.submissioncombowidget.addItems(self.theDataThing.getSubmissionList())
         self.submissioncombowidget.setCurrentIndex(-1)
 
+
+    def submission_reset(self, name):
+        self.theDataThing.submissionReset()
             
     def submission_raw_changed(self, name):
+        self.node_raw_widget.clear()
         self.node_raw_widget.setTitle(f"Raw node counts for {name}")
         self.node_raw_widget.setLabel("left", "Count")
         self.node_raw_widget.setLabel("bottom", "Node")
@@ -284,6 +317,7 @@ class MainWindow(QMainWindow):
     
     
     def submission_percentage_changed(self, name):
+        self.node_percentage_widget.clear()
         self.node_percentage_widget.setTitle(f"Percentage counts for {name}")
         self.node_percentage_widget.setLabel("left", "Count")
         self.node_percentage_widget.setLabel("bottom", "Node")
@@ -344,6 +378,12 @@ class MainWindow(QMainWindow):
 
 
     def error_warning_tables(self, name):
+        #Delete all the old stuff
+        self.errormodel = SubmissionTableModel(pd.DataFrame())
+        self.warningmodel = SubmissionTableModel(pd.DataFrame())
+        self.errorsummarytable.setModel(self.errormodel)
+        self.warningsummarytable.setModel(self.warningmodel)
+        #Add new data
         error_df = self.theDataThing.validationErrorData(url=self.creds['url'], apitoken=self.creds['token'],submissionname=name)
         warning_df = self.theDataThing.validationWarningData(url=self.creds['url'], apitoken=self.creds['token'],submissionname=name)
         if error_df is not None:
@@ -381,6 +421,25 @@ class MainWindow(QMainWindow):
         if data_df is not None:
             self.fulldatamodel = SubmissionTableModel(data_df)
             self.fulldatatable.setModel(self.fulldatamodel)
+            
+    
+    def submission_reset(self, name):
+        #Run when the submisison is changed
+        self.resetmodel = SubmissionTableModel(pd.DataFrame())
+        
+        ##self.fulldatamodel = SubmissionTableModel(pd.DataFrame())
+        self.fulldatatable.setModel(self.resetmodel)
+        
+        #self.fullwarningmodel = SubmissionTableModel(pd.DataFrame())
+        self.fullwarningtable.setModel(self.resetmodel)
+        
+        #self.fullerrormodel = SubmissionTableModel(pd.DataFrame())
+        self.fullerrortable.setModel(self.resetmodel)
+        
+        #self.errormodel = SubmissionTableModel(pd.DataFrame())
+        #self.warningmodel = SubmissionTableModel(pd.DataFrame())
+        self.errorsummarytable.setModel(self.resetmodel)
+        self.warningsummarytable.setModel(self.resetmodel)
 
 
 
